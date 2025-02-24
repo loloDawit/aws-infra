@@ -3,3 +3,13 @@ variable "cluster_name" {
   type        = string
   default     = "eks-cluster"
 }
+
+variable "vpc_id" {
+  description = "VPC ID for EKS cluster"
+  type        = string
+}
+
+variable "subnet_ids" {
+  description = "Subnet IDs for EKS cluster"
+  type        = list(string)
+}

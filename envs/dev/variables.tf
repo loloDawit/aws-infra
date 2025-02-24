@@ -7,3 +7,10 @@ variable "dynamodb_table_name" {
   description = "DynamoDB table name for Terraform state locking"
   type        = string
 }
+
+
+variable "cluster_name" {
+  description = "EKS Cluster Name"
+  type        = string
+  default     = "expense-tracker-cluster"
+}
