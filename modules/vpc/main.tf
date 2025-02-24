@@ -1,5 +1,8 @@
 resource "aws_vpc" "eks_vpc" {
   cidr_block = "10.0.0.0/16"
+  tags = {
+    Name = var.vpc_name  # ✅ Use the variable to name the VPC
+  }
 }
 
 resource "aws_subnet" "eks_subnets" {
