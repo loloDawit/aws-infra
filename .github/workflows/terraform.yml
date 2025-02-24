@@ -27,10 +27,17 @@ jobs:
         uses: hashicorp/setup-terraform@v2
 
       - name: Terraform Init
-        run: terraform init
+        run: |
+          cd envs/dev
+          terraform init
 
       - name: Terraform Plan
-        run: terraform plan
+        run: |
+          cd envs/dev
+          terraform plan
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve
+        if: github.ref == 'refs/heads/main'
+        run: |
+          cd envs/dev
+          terraform apply -auto-approve
