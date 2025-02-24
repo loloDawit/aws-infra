@@ -28,16 +28,16 @@ jobs:
 
       - name: Terraform Init
         run: |
-          cd envs/dev
-          terraform init
+          terraform init -input=false
+        working-directory: envs/dev  # ✅ Run Terraform inside the correct directory
 
       - name: Terraform Plan
         run: |
-          cd envs/dev
-          terraform plan
+          terraform plan -input=false -var-file=terraform.tfvars
+        working-directory: envs/dev  # ✅ Run Terraform inside the correct directory
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main'
         run: |
-          cd envs/dev
-          terraform apply -auto-approve
+          terraform apply -auto-approve -input=false -var-file=terraform.tfvars
+        working-directory: envs/dev  # ✅ Run Terraform inside the correct directory
