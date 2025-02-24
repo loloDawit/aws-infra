@@ -22,21 +22,44 @@ jobs:
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubActionsOIDC
           aws-region: us-west-2
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
+      - name: Check if S3 Bucket Exists
+        id: check_s3
+        continue-on-error: true
+        run: |
+          if aws s3api head-bucket --bucket "expense-tracker-terraform-state" 2>/dev/null; then
+            echo "S3 bucket exists, skipping bootstrap..."
+            echo "skip_bootstrap=true" >> $GITHUB_ENV
+          else
+            echo "S3 bucket does not exist."
+            echo "skip_bootstrap=false" >> $GITHUB_ENV
+          fi
 
-      - name: Terraform Init (Backend)
+      - name: Check if DynamoDB Table Exists
+        id: check_dynamodb
+        continue-on-error: true
+        run: |
+          if aws dynamodb describe-table --table-name "expense-tracker-terraform-locks" 2>/dev/null; then
+            echo "DynamoDB table exists, skipping bootstrap..."
+            echo "skip_bootstrap=true" >> $GITHUB_ENV
+          else
+            echo "DynamoDB table does not exist."
+            echo "skip_bootstrap=false" >> $GITHUB_ENV
+          fi
+
+      - name: Terraform Init (Bootstrap)
+        if: env.skip_bootstrap == 'false'  # ✅ Only run if resources don't exist
         run: |
           cd envs/bootstrap
           terraform init -input=false
 
       - name: Terraform Apply (Create Backend)
+        if: env.skip_bootstrap == 'false'  # ✅ Only run if resources don't exist
         run: |
           cd envs/bootstrap
           terraform apply -auto-approve -input=false
 
   terraform-deploy:
-    needs: bootstrap-backend  # ✅ Ensures this waits for backend creation
+    needs: bootstrap-backend
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -51,17 +74,17 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
 
-      - name: Terraform Init (Main Infrastructure)
+      - name: Terraform Init
         run: |
           cd envs/dev
           terraform init -input=false
 
-      - name: Terraform Plan (Main Infrastructure)
+      - name: Terraform Plan
         run: |
           cd envs/dev
           terraform plan -input=false -var-file=terraform.tfvars
 
-      - name: Terraform Apply (Main Infrastructure)
+      - name: Terraform Apply
         if: github.ref == 'refs/heads/main'
         run: |
           cd envs/dev
