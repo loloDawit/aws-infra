@@ -1,9 +1,9 @@
 terraform {
   backend "s3" {
-    bucket         = "expense-tracker-terraform-state"  # ✅ Unique bucket name
+    bucket         = "expense-tracker-terraform-state"  # ✅ Ensure it matches the bootstrap step
     key            = "dev/terraform.tfstate"
     region         = "us-west-2"
-    dynamodb_table = "expense-tracker-terraform-locks"  # ✅ Unique DynamoDB table
+    dynamodb_table = "expense-tracker-terraform-locks"
     encrypt        = true
   }
 }
