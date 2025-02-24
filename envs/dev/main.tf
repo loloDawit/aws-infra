@@ -12,10 +12,6 @@ provider "aws" {
   region = "us-west-2"
 }
 
-module "backend" {
-  source              = "../../modules/backend"
-  project_name        = "expense-tracker"  # ✅ Prefix to ensure uniqueness
-}
 
 module "vpc" {
   source   = "../../modules/vpc"
