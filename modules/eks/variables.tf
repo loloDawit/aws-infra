@@ -13,3 +13,8 @@ variable "subnet_ids" {
   description = "Subnet IDs for EKS cluster"
   type        = list(string)
 }
+
+variable "subnet_ids" {
+  description = "Subnets for EKS cluster nodes"
+  type        = list(string)
+}
