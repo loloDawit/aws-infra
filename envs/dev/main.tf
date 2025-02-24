@@ -1,9 +1,9 @@
 terraform {
   backend "s3" {
-    bucket         = "terraform-eks-state"
+    bucket         = "expense-tracker-terraform-state"  # ✅ Unique bucket name
     key            = "dev/terraform.tfstate"
     region         = "us-west-2"
-    dynamodb_table = "terraform-locks"
+    dynamodb_table = "expense-tracker-terraform-locks"  # ✅ Unique DynamoDB table
     encrypt        = true
   }
 }
@@ -13,24 +13,23 @@ provider "aws" {
 }
 
 module "backend" {
-  source              = "../../modules/backend"  # ✅ Use correct relative path
-  s3_bucket_name      = "terraform-eks-state"
-  dynamodb_table_name = "terraform-locks"
+  source              = "../../modules/backend"
+  project_name        = "expense-tracker"  # ✅ Prefix to ensure uniqueness
 }
 
 module "vpc" {
-  source   = "../../modules/vpc"  # ✅ Use correct relative path
+  source   = "../../modules/vpc"
   vpc_name = "eks-vpc"
 }
 
 module "eks" {
-  source       = "../../modules/eks"  # ✅ Use correct relative path
+  source       = "../../modules/eks"
   cluster_name = "expense-tracker-cluster"
   vpc_id       = module.vpc.vpc_id
   subnet_ids   = module.vpc.subnet_ids
 }
 
 module "ecr" {
-  source    = "../../modules/ecr"  # ✅ Use correct relative path
+  source    = "../../modules/ecr"
   repo_name = "expense-tracker"
 }
